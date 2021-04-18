@@ -1,0 +1,40 @@
+public function create(){
+		$this->load->helper(array('form', 'url'));
+		$this->load->library('form_validation');
+
+		if (isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST") {
+			$this->form_validation->set_rules('title','Title','required');
+			$this->form_validation->set_rules('content','Content','required');
+
+			if ($this->form_validation->run()===false){
+				$this->load->view('article/add');
+			}else{
+				if ($_FILES['file']['tmp_name']){
+
+					$upload_path='./uploads/article/';
+
+					$config['upload_path']          = $upload_path;
+					$config['allowed_types']        = 'gif|jpg|png';
+					$config['max_size']             = 1000;
+					$config['max_width']            = 960;
+					$config['max_height']           = 1280;
+
+					$this->load->library('upload', $config);
+
+					if ($this->upload->do_upload('file')) {
+						echo 'success';
+					} else {
+						$this->load->view('article/add',array('fileError'=>$this->upload->display_errors()));
+					}
+
+				}else{
+					echo 'file not uploaded';
+				}
+
+			}
+
+		}else {
+			$this->load->view('article/add');
+		}
+
+	}
